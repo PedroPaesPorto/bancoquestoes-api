@@ -1,0 +1,6 @@
+{
+  "name": "bancoquestoes-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Funções do Banco de Questões (IA com Gemini)"
+}
