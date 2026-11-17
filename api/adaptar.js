@@ -1,6 +1,7 @@
 // Adapta uma questão para alunos com TEA ou para alunos não leitores / leitores iniciantes.
 
 const { falha, responder, responderErro, tratarCors, exigirProfessorAtivo, chamarGemini } = require("../lib/comum");
+const { normalizarFormulas } = require("../lib/formulas");
 
 const LETRAS = ["A", "B", "C", "D", "E"];
 
@@ -202,10 +203,14 @@ function conferirSaida(saida, entrada) {
     if (typeof saida.gabarito !== "string" || !saida.gabarito.trim()) saida.gabarito = questao.gabarito;
   }
 
+  saida.enunciado = normalizarFormulas(saida.enunciado);
+  saida.alternativas = (saida.alternativas || []).map((a) => ({ ...a, texto: normalizarFormulas(a.texto) }));
+  if (questao.tipo === "discursiva") saida.gabarito = normalizarFormulas(saida.gabarito);
+
   saida.mudancas = Array.isArray(saida.mudancas) ? saida.mudancas.slice(0, 8) : [];
   saida.suportesVisuais = Array.isArray(saida.suportesVisuais) ? saida.suportesVisuais.slice(0, 10) : [];
   saida.orientacaoAoMediador = typeof saida.orientacaoAoMediador === "string" ? saida.orientacaoAoMediador : "";
-  saida.justificativa = typeof saida.justificativa === "string" && saida.justificativa.trim() ? saida.justificativa : questao.justificativa;
+  saida.justificativa = normalizarFormulas(typeof saida.justificativa === "string" && saida.justificativa.trim() ? saida.justificativa : questao.justificativa);
   return saida;
 }
 
