@@ -2,6 +2,7 @@
 // e devolve as questões separadas, para o professor revisar uma a uma.
 
 const { falha, responder, responderErro, tratarCors, exigirProfessorAtivo, chamarGemini } = require("../lib/comum");
+const { normalizarFormulas } = require("../lib/formulas");
 
 const LETRAS = ["A", "B", "C", "D", "E"];
 const MIMES = ["image/jpeg", "image/png", "image/webp"];
@@ -13,7 +14,11 @@ const INSTRUCAO = [
   "REGRAS DE TRANSCRIÇÃO",
   "- Transcreva fielmente o texto de cada questão, em português. Não reescreva, não resuma, não corrija o conteúdo.",
   "- Ignore cabeçalhos da escola, campos de nome, data e nota, instruções gerais, números de página e propagandas.",
-  "- Fórmulas de matemática, física e química: escreva em LaTeX, usando \\( ... \\) no meio do texto e \\[ ... \\] em destaque. Química com \\ce{...}. Nunca use o símbolo de cifrão para fórmulas, pois ele aparece em valores em reais.",
+  "- FÓRMULAS: escreva TODA expressão de matemática, física ou química em LaTeX, mesmo as simples (por exemplo x², 3/4, H₂O). Use \\( ... \\) no meio do texto e \\[ ... \\] para equações em destaque. Nunca use o símbolo de cifrão para isso, pois ele aparece em valores em reais.",
+  "- Modelos: fração \\frac{a}{b}; potência x^{2}; índice x_{1}; raiz \\sqrt{x} e \\sqrt[3]{x}; multiplicação \\cdot ou \\times; divisão \\div; \\le, \\ge, \\ne, \\approx, \\pi; porcentagem 20\\%; grau 30^\\circ; módulo |x|; unidades com \\text{ cm}; sistemas com \\begin{cases} ... \\end{cases}; vetor \\vec{v}; \\lim e \\sum.",
+  "- Química: fórmulas e reações com \\ce{...}. Exemplos: \\ce{H2O}, \\ce{CO2}, \\ce{2H2 + O2 -> 2H2O}, \\ce{Fe^{3+}}, \\ce{SO4^{2-}}.",
+  "- Confira cada expoente e cada índice com atenção, pois x² e x₂ são diferentes. Transcreva exatamente o que está impresso, sem simplificar nem resolver a conta.",
+  "- Como a resposta é um JSON, escreva cada barra invertida em dobro (por exemplo \\\\frac), para que o resultado final tenha uma barra só.",
   "- Tabelas simples: transcreva em linhas de texto com as células separadas por \" | \". Tabelas complexas contam como figura.",
   "- Alternativas: letras de A a E, com o texto de cada uma. Se a alternativa for só uma figura, deixe o texto vazio e descreva a figura.",
   "",
@@ -213,7 +218,7 @@ function limparFigura(figura, entrada) {
 }
 
 function limparQuestao(q, entrada, apoiosValidos) {
-  const enunciado = String(q.enunciado || "").trim().slice(0, 4000);
+  const enunciado = normalizarFormulas(String(q.enunciado || "").trim()).slice(0, 4000);
   if (enunciado.length < 5) return null;
 
   let alternativas = [];
@@ -224,7 +229,7 @@ function limparQuestao(q, entrada, apoiosValidos) {
     vistas.add(letra);
     alternativas.push({
       letra,
-      texto: String(alt.texto || "").trim().slice(0, 600),
+      texto: normalizarFormulas(String(alt.texto || "").trim()).slice(0, 600),
       figura: limparFigura(alt.figura, entrada)
     });
   });
@@ -240,7 +245,7 @@ function limparQuestao(q, entrada, apoiosValidos) {
   }
   if (tipo === "discursiva") alternativas = [];
 
-  let gabarito = String(q.gabarito || "").trim().slice(0, 3000);
+  let gabarito = normalizarFormulas(String(q.gabarito || "").trim()).slice(0, 3000);
   let origem = ["documento", "ia", "nenhum"].includes(q.gabaritoOrigem) ? q.gabaritoOrigem : "nenhum";
   if (tipo === "multipla_escolha") {
     gabarito = gabarito.toUpperCase().replace(/[^A-E]/g, "").slice(0, 1);
@@ -262,7 +267,7 @@ function limparQuestao(q, entrada, apoiosValidos) {
     alternativas,
     gabarito,
     gabaritoOrigem: origem,
-    justificativa: String(q.justificativa || "").trim().slice(0, 3000),
+    justificativa: normalizarFormulas(String(q.justificativa || "").trim()).slice(0, 3000),
     assunto: String(q.assunto || "").trim().slice(0, 120),
     dificuldade: ["facil", "media", "dificil"].includes(q.dificuldade) ? q.dificuldade : "media",
     cortada: Boolean(q.cortada),
@@ -279,7 +284,7 @@ function conferirSaida(bruto, entrada) {
       id: String((a && a.id) || "").trim().slice(0, 20),
       titulo: String((a && a.titulo) || "").trim().slice(0, 200),
       fonte: String((a && a.fonte) || "").trim().slice(0, 200),
-      texto: String((a && a.texto) || "").trim().slice(0, 12000),
+      texto: normalizarFormulas(String((a && a.texto) || "").trim()).slice(0, 12000),
       figuras: (Array.isArray(a && a.figuras) ? a.figuras : []).slice(0, 4).map((f) => limparFigura(f, entrada)).filter(Boolean)
     }))
     .filter((a) => a.id && (a.texto.length >= 5 || a.figuras.length > 0));
