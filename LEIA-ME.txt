@@ -1,0 +1,11 @@
+PACOTE DA API (Vercel)
+======================
+Este pacote é SÓ da API. Vai no repositório que está ligado ao Vercel (bancoquestoes-api).
+NÃO misture com o pacote do site: vários arquivos têm nomes parecidos mas são diferentes.
+
+Como atualizar
+1. Extraia o zip.
+2. No repositório da API: Add file > Upload files, e arraste o CONTEÚDO da pasta extraída (api, lib, package.json, vercel.json).
+3. Se existirem no repositório os arquivos antigos lib/comum.js e lib/formulas.js, pode apagar (agora se chamam
+   servidor-comum.js e servidor-formulas.js). Apague também api/teste.js, se existir.
+4. O Vercel republica sozinho. As variáveis (GEMINI_API_KEY, FIREBASE_PROJECT_ID, ORIGENS_PERMITIDAS) não mudam.

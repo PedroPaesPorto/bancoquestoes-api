@@ -1,8 +1,8 @@
 // Lê fotos ou páginas de uma prova (modo "paginas") ou o texto de um arquivo Word (modo "texto")
 // e devolve as questões separadas, para o professor revisar uma a uma.
 
-const { falha, responder, responderErro, tratarCors, exigirProfessorAtivo, chamarGemini } = require("../lib/comum");
-const { normalizarFormulas } = require("../lib/formulas");
+const { falha, responder, responderErro, tratarCors, exigirProfessorAtivo, chamarGemini } = require("../lib/servidor-comum");
+const { normalizarFormulas } = require("../lib/servidor-formulas");
 
 const LETRAS = ["A", "B", "C", "D", "E"];
 const MIMES = ["image/jpeg", "image/png", "image/webp"];

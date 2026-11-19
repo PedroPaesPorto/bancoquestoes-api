@@ -1,7 +1,7 @@
 // Adapta uma questão para alunos com TEA ou para alunos não leitores / leitores iniciantes.
 
-const { falha, responder, responderErro, tratarCors, exigirProfessorAtivo, chamarGemini } = require("../lib/comum");
-const { normalizarFormulas } = require("../lib/formulas");
+const { falha, responder, responderErro, tratarCors, exigirProfessorAtivo, chamarGemini } = require("../lib/servidor-comum");
+const { normalizarFormulas } = require("../lib/servidor-formulas");
 
 const LETRAS = ["A", "B", "C", "D", "E"];
 
